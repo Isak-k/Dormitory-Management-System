@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DMS Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="bg-animated">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2 class="gradient-text" style="font-family: 'Orbitron'; font-size: 22px;">
+          <i class="fa-solid fa-shield-halved"></i> DMS Admin
+        </h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-link active" onclick="switchSection('dashboard')">
+          <i class="fa-solid fa-chart-pie"></i> Dashboard
+        </a>
+        <a class="nav-link" onclick="switchSection('buildings')">
+          <i class="fa-solid fa-building"></i> Buildings & Rooms
+        </a>
+        <a class="nav-link" onclick="switchSection('reports')">
+          <i class="fa-solid fa-file-alt"></i> Reports <span class="badge-notification" id="reports-badge" style="display:none; margin-left: auto;">0</span>
+        </a>
+        <a class="nav-link" onclick="switchSection('manage')">
+          <i class="fa-solid fa-users-gear"></i> Manage Students
+        </a>
+        <a class="nav-link" onclick="switchSection('assign')">
+          <i class="fa-solid fa-bed"></i> Assign Dorm
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-danger btn-full" onclick="logout()">
+          <i class="fa-solid fa-power-off"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="topbar">
+        <div style="font-size: 20px; font-weight: 600;">
+          <i class="fa-solid fa-chart-line"></i> Admin Dashboard
+        </div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+          <div class="search-bar" style="display: flex; align-items: center; gap: 8px; background: var(--glass); padding: 8px 14px; border-radius: var(--border-radius-sm); border: 1px solid var(--glass-border);">
+            <i class="fa-solid fa-search" style="color: var(--text-muted); font-size: 14px;"></i>
+            <input type="text" id="globalSearch" placeholder="Search..." style="background: none; border: none; color: var(--text-primary); font-size: 13px; outline: none; width: 150px;">
+          </div>
+          <button class="btn btn-ghost btn-sm" title="Notifications">
+            <i class="fa-solid fa-bell"></i>
+            <span style="position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>
+          </button>
+          <button class="btn btn-ghost btn-sm dark-mode-toggle">
+            <i class="fa-solid fa-sun"></i>
+          </button>
+          <div class="avatar-placeholder" style="width: 40px; height: 40px; font-size: 16px;">A</div>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <!-- Dashboard Overview -->
+        <section id="dashboard" class="dashboard-section active">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fa-solid fa-chart-line"></i> System Overview
+            </h2>
+          </div>
+
+          <div class="grid-cards">
+            <div class="stat-card" style="--card-accent: var(--grad-cyan); --card-glow: rgba(0,212,255,0.15);">
+              <div class="stat-card-trend trend-up">+12%</div>
+              <div class="stat-card-icon" style="background: rgba(0,212,255,0.1); color: #00d4ff;">
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <div class="stat-card-value" id="stat-total-students">0</div>
+              <div class="stat-card-label">Total Students</div>
+            </div>
+
+            <div class="stat-card" style="--card-accent: var(--grad-purple); --card-glow: rgba(124,58,237,0.15);">
+              <div class="stat-card-trend trend-up">+8%</div>
+              <div class="stat-card-icon" style="background: rgba(124,58,237,0.1); color: #a78bfa;">
+                <i class="fa-solid fa-bed"></i>
+              </div>
+              <div class="stat-card-value" id="stat-occupied-rooms">0</div>
+              <div class="stat-card-label">Occupied Rooms</div>
+            </div>
+
+            <div class="stat-card" style="--card-accent: var(--grad-green); --card-glow: rgba(16,185,129,0.15);">
+              <div class="stat-card-trend trend-up">+5%</div>
+              <div class="stat-card-icon" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                <i class="fa-solid fa-check-circle"></i>
+              </div>
+              <div class="stat-card-value" id="stat-occupancy">0%</div>
+              <div class="stat-card-label">Occupancy Rate</div>
+            </div>
+
+            <div class="stat-card" style="--card-accent: var(--grad-orange); --card-glow: rgba(245,158,11,0.15);">
+              <div class="stat-card-trend trend-down">-3%</div>
+              <div class="stat-card-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">
+                <i class="fa-solid fa-exclamation-circle"></i>
+              </div>
+              <div class="stat-card-value" id="stat-pending-tasks">0</div>
+              <div class="stat-card-label">Pending Tasks</div>
+            </div>
+
+            <div class="stat-card" style="--card-accent: var(--grad-pink); --card-glow: rgba(236,72,153,0.15);">
+              <div class="stat-card-trend trend-up">+2</div>
+              <div class="stat-card-icon" style="background: rgba(236,72,153,0.1); color: #ec4899;">
+                <i class="fa-solid fa-file-alt"></i>
+              </div>
+              <div class="stat-card-value" id="stat-pending-reports">0</div>
+              <div class="stat-card-label">Pending Reports</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 30px;">
+            <div class="glass-card" style="padding: 24px;">
+              <h3 class="neon-text" style="margin-bottom: 16px; font-size: 16px;">
+                <i class="fa-solid fa-building"></i> Buildings
+              </h3>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--glass-border);">
+                  <span>Block A</span>
+                  <span style="color: var(--accent-cyan); font-weight: 600;">45 Students</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--glass-border);">
+                  <span>Block B</span>
+                  <span style="color: var(--accent-purple); font-weight: 600;">38 Students</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                  <span>Block C</span>
+                  <span style="color: var(--accent-pink); font-weight: 600;">32 Students</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card" style="padding: 24px;">
+              <h3 class="neon-text" style="margin-bottom: 16px; font-size: 16px;">
+                <i class="fa-solid fa-chart-bar"></i> Department Distribution
+              </h3>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--glass-border);">
+                  <span>Computer Science</span>
+                  <span style="color: var(--accent-green); font-weight: 600;">35 Students</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--glass-border);">
+                  <span>Engineering</span>
+                  <span style="color: var(--accent-orange); font-weight: 600;">42 Students</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                  <span>Other</span>
+                  <span style="color: var(--accent-cyan); font-weight: 600;">38 Students</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Buildings & Rooms -->
+        <section id="buildings" class="dashboard-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fa-solid fa-building"></i> Buildings & Dorms Management
+            </h2>
+            <button class="btn btn-cyan" onclick="openAddBuildingModal()">
+              <i class="fa-solid fa-plus"></i> Add Building
+            </button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+            <!-- Add Building Form -->
+            <div class="glass-card" style="padding: 30px; height: fit-content;">
+              <h3 class="gradient-text" style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fa-solid fa-plus-circle"></i> New Building
+              </h3>
+              <form id="buildingForm" onsubmit="handleAddBuilding(event)">
+                <div class="form-group">
+                  <label class="form-label">Building Name</label>
+                  <input type="text" id="building-name" class="form-input" placeholder="e.g., Amel 1 A" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Total Dorms</label>
+                  <input type="number" id="total-dorms" class="form-input" placeholder="e.g., 50" min="1" max="200" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Capacity per Dorm</label>
+                  <input type="number" id="dorm-capacity" class="form-input" placeholder="e.g., 2" min="1" max="10" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Gender Based</label>
+                  <select id="building-gender" class="form-select" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                  <i class="fa-solid fa-save"></i> Add Building
+                </button>
+              </form>
+            </div>
+
+            <!-- Buildings List -->
+            <div class="glass-card table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Building</th><th>Total Dorms</th><th>Capacity</th><th>Gender</th><th>Occupied</th><th>Available</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="buildings-list"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Manage Students -->
+        <section id="manage" class="dashboard-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fa-solid fa-users-gear"></i> Manage Students
+            </h2>
+            <button class="btn btn-cyan" onclick="openAddModal()">
+              <i class="fa-solid fa-plus"></i> Add Student
+            </button>
+          </div>
+
+          <div class="glass-card" style="padding: 20px; margin-bottom: 20px;">
+            <input type="text" id="studentSearch" placeholder="Search by name, ID, or department..." class="form-input" style="width: 100%;">
+          </div>
+
+          <div class="glass-card table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Department</th>
+                  <th>Gender</th>
+                  <th>Building</th>
+                  <th>Dorm</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-student-list"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Assign Dorm -->
+        <section id="assign" class="dashboard-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fa-solid fa-bed"></i> Assign / Reassign Dorm
+            </h2>
+          </div>
+
+          <div class="glass-card" style="padding: 30px; max-width: 600px;">
+            <form id="assignForm" onsubmit="handleAssign(event)">
+              <div class="form-group">
+                <label class="form-label">Select Student</label>
+                <select id="assign-student-id" class="form-select" required></select>
+              </div>
+
+              <div style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;">
+                  <label class="form-label">Building</label>
+                  <select id="assign-building" class="form-select" required onchange="updateDormOptions()">
+                    <option value="">Select Building</option>
+                  </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                  <label class="form-label">Dorm Number</label>
+                  <select id="assign-dorm" class="form-select" required>
+                    <option value="">Select Dorm</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-full">
+                <i class="fa-solid fa-save"></i> Save Assignment
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <!-- Maintenance Requests -->
+        <section id="maintenance" class="dashboard-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fa-solid fa-wrench"></i> Maintenance Requests
+            </h2>
+          </div>
+
+          <div class="glass-card table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Student</th>
+                  <th>Issue</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="maintenance-list">
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                    <i class="fa-solid fa-inbox" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                    No maintenance requests yet
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Reports -->
+        <section id="reports" class="dashboard-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fa-solid fa-file-alt"></i> Student Reports
+            </h2>
+            <button class="btn btn-cyan" onclick="refreshReports()">
+              <i class="fa-solid fa-sync"></i> Refresh
+            </button>
+          </div>
+
+          <div class="glass-card table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Student</th><th>Type</th><th>Subject</th><th>Status</th><th>Date</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-reports-list"></tbody>
+            </table>
+          </div>
+        </section>
+            <div class="glass-card" style="padding: 24px;">
+              <h3 class="gradient-text" style="margin-bottom: 16px; font-size: 16px;">
+                <i class="fa-solid fa-chart-pie"></i> Student Distribution
+              </h3>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>Total Registered</span>
+                  <span style="font-size: 20px; font-weight: 700; color: var(--accent-cyan);" id="report-total">0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>Assigned Dorms</span>
+                  <span style="font-size: 20px; font-weight: 700; color: var(--accent-green);" id="report-assigned">0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>Unassigned</span>
+                  <span style="font-size: 20px; font-weight: 700; color: var(--accent-orange);" id="report-unassigned">0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card" style="padding: 24px;">
+              <h3 class="gradient-text" style="margin-bottom: 16px; font-size: 16px;">
+                <i class="fa-solid fa-building"></i> Room Occupancy
+              </h3>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>Total Rooms</span>
+                  <span style="font-size: 20px; font-weight: 700; color: var(--accent-cyan);">120</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>Occupied</span>
+                  <span style="font-size: 20px; font-weight: 700; color: var(--accent-green);" id="report-occupied">0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>Available</span>
+                  <span style="font-size: 20px; font-weight: 700; color: var(--accent-purple);" id="report-available">120</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card" style="padding: 24px; max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+            <h3 style="margin-bottom: 16px; font-size: 16px; position: sticky; top: 0; background: rgba(10, 22, 40, 0.8); padding: 12px 0; z-index: 10;">
+              <i class="fa-solid fa-list"></i> Detailed Report
+            </h3>
+            <div id="detailed-report" style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                <i class="fa-solid fa-inbox" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                No detailed reports available
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Settings -->
+        <section id="settings" class="dashboard-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fa-solid fa-gear"></i> Settings
+            </h2>
+          </div>
+
+          <div class="glass-card" style="padding: 30px; max-width: 600px;">
+            <h3 style="margin-bottom: 20px; font-size: 18px;">System Settings</h3>
+
+            <div class="form-group">
+              <label class="form-label">System Name</label>
+              <input type="text" class="form-input" value="Dormitory Management System" readonly>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Version</label>
+              <input type="text" class="form-input" value="1.0.0" readonly>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Last Updated</label>
+              <input type="text" class="form-input" id="lastUpdated" readonly>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <input type="checkbox" style="width: 16px; height: 16px; margin-right: 8px;">
+                Enable Email Notifications
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <input type="checkbox" style="width: 16px; height: 16px; margin-right: 8px;" checked>
+                Enable Maintenance Alerts
+              </label>
+            </div>
+
+            <button class="btn btn-primary btn-full" onclick="saveSettings()">
+              <i class="fa-solid fa-save"></i> Save Settings
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal-overlay" id="studentModalOverlay">
+    <div class="modal">
+      <h3 class="gradient-text" id="modalTitle" style="font-size: 24px; margin-bottom: 20px;">Add Student</h3>
+      <form id="studentForm" onsubmit="handleStudentSave(event)">
+        <input type="hidden" id="editIndex">
+
+        <div class="form-group">
+          <label class="form-label">Student ID</label>
+          <input type="text" id="studId" class="form-input" placeholder="e.g., 1234/17" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="studName" class="form-input" placeholder="Full Name" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Department</label>
+          <input type="text" id="studDept" class="form-input" placeholder="Department" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <select id="studGender" class="form-select" required>
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="submit" class="btn btn-green" style="flex: 1;">Save</button>
+          <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="closeModal('studentModalOverlay')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Building Modal -->
+  <div class="modal-overlay" id="editBuildingModalOverlay">
+    <div class="modal">
+      <h3 class="gradient-text" style="font-size: 24px; margin-bottom: 20px;">Edit Building</h3>
+      <form id="editBuildingForm" onsubmit="handleEditBuilding(event)">
+        <input type="hidden" id="editBuildingIndex">
+
+        <div class="form-group">
+          <label class="form-label">Building Name</label>
+          <input type="text" id="edit-building-name" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Total Dorms</label>
+          <input type="number" id="edit-total-dorms" class="form-input" min="1" max="200" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Capacity per Dorm</label>
+          <input type="number" id="edit-dorm-capacity" class="form-input" min="1" max="10" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Gender Based</label>
+          <select id="edit-building-gender" class="form-select" required>
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Update</button>
+          <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="closeModal('editBuildingModalOverlay')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Report Review Modal -->
+  <div class="modal-overlay" id="reportModalOverlay">
+    <div class="modal" style="max-width: 500px;">
+      <h3 class="gradient-text" style="font-size: 24px; margin-bottom: 20px;">Review Report</h3>
+      <form id="reportReviewForm" onsubmit="handleReportReview(event)">
+        <input type="hidden" id="reviewReportId">
+
+        <div class="form-group">
+          <label class="form-label">Student</label>
+          <input type="text" id="reviewStudentName" class="form-input" readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <input type="text" id="reviewReportType" class="form-input" readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <input type="text" id="reviewReportSubject" class="form-input" readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="reviewReportDesc" class="form-textarea" readonly></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select id="reviewReportStatus" class="form-select" required>
+            <option value="Pending">Pending</option>
+            <option value="In Review">In Review</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Admin Comment</label>
+          <textarea id="reviewReportComment" class="form-textarea" placeholder="Add your comment..."></textarea>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Update</button>
+          <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="closeModal('reportModalOverlay')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Security Check
+    const user = getCurrentUser();
+    if (!user || user.role !== 'admin') window.location.href = 'login.html';
+
+    function switchSection(id) {
+      document.querySelectorAll('.dashboard-section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+    }
+
+    function updateStats() {
+      const students = getStudents();
+      const assigned = students.filter(s => s.dorm).length;
+      const occupancy = Math.round((assigned / students.length) * 100) || 0;
+      const pendingReports = getReports().filter(r => r.status === 'Pending').length;
+
+      document.getElementById('stat-total-students').innerText = students.length;
+      document.getElementById('stat-occupied-rooms').innerText = assigned;
+      document.getElementById('stat-occupancy').innerText = occupancy + '%';
+      document.getElementById('stat-pending-tasks').innerText = getRequests().length;
+      document.getElementById('stat-pending-reports').innerText = pendingReports;
+
+      // Update badge
+      const badge = document.getElementById('reports-badge');
+      if (pendingReports > 0) {
+        badge.innerText = pendingReports;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    function renderAdminTable() {
+      const students = getStudents();
+      const tbody = document.getElementById('admin-student-list');
+      const assignSelect = document.getElementById('assign-student-id');
+      tbody.innerHTML = '';
+      assignSelect.innerHTML = '<option value="">Choose Student...</option>';
+
+      if (students.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);"><i class="fa-solid fa-inbox" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>No students registered</td></tr>';
+        return;
+      }
+
+      students.forEach((s, idx) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${s.id}</td>
+            <td>${s.name}</td>
+            <td>${s.department}</td>
+            <td><span class="badge badge-cyan">${s.gender}</span></td>
+            <td>${s.building || '-'}</td>
+            <td><span class="badge badge-purple">${s.dorm || 'Unassigned'}</span></td>
+            <td>
+              <button class="btn btn-ghost btn-sm" onclick="editStudent(${idx})" title="Edit">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="deleteStudent(${idx})" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+        assignSelect.innerHTML += `<option value="${s.id}">${s.name} (${s.id})</option>`;
+      });
+
+      updateStats();
+      populateBuildingSelect();
+    }
+
+    function openAddModal() {
+      document.getElementById('modalTitle').innerText = 'Add Student';
+      document.getElementById('studentForm').reset();
+      document.getElementById('editIndex').value = '';
+      document.getElementById('studentModalOverlay').classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function handleStudentSave(e) {
+      e.preventDefault();
+      const students = getStudents();
+      const idx = document.getElementById('editIndex').value;
+      const data = {
+        id: document.getElementById('studId').value,
+        name: document.getElementById('studName').value,
+        department: document.getElementById('studDept').value,
+        gender: document.getElementById('studGender').value,
+        building: '',
+        dorm: '',
+        capacity: '2'
+      };
+
+      if (idx !== '') {
+        data.building = students[idx].building;
+        data.dorm = students[idx].dorm;
+        data.capacity = students[idx].capacity;
+        students[idx] = data;
+        showToast('Student updated successfully', 'success');
+      } else {
+        students.push(data);
+        showToast('Student added successfully', 'success');
+      }
+
+      saveStudents(students);
+      renderAdminTable();
+      closeModal('studentModalOverlay');
+    }
+
+    function editStudent(idx) {
+      const students = getStudents();
+      const s = students[idx];
+      document.getElementById('studId').value = s.id;
+      document.getElementById('studName').value = s.name;
+      document.getElementById('studDept').value = s.department;
+      document.getElementById('studGender').value = s.gender;
+      document.getElementById('editIndex').value = idx;
+      document.getElementById('modalTitle').innerText = 'Edit Student';
+      document.getElementById('studentModalOverlay').classList.add('active');
+    }
+
+    function deleteStudent(idx) {
+      if (confirm('Are you sure you want to delete this student?')) {
+        const students = getStudents();
+        students.splice(idx, 1);
+        saveStudents(students);
+        renderAdminTable();
+        showToast('Student deleted successfully', 'success');
+      }
+    }
+
+    function handleAssign(e) {
+      e.preventDefault();
+      const sid = document.getElementById('assign-student-id').value;
+      const bld = document.getElementById('assign-building').value;
+      const room = document.getElementById('assign-room').value;
+
+      if (!sid) {
+        showToast('Please select a student', 'error');
+        return;
+      }
+
+      const buildings = getBuildings();
+      const building = buildings.find(b => b.building === bld && b.room === room);
+      
+      if (!building) {
+        showToast('Invalid room selection', 'error');
+        return;
+      }
+
+      // Check capacity
+      const students = getStudents();
+      const occupied = students.filter(s => s.building === bld && s.dorm === room).length;
+      
+      if (occupied >= building.capacity) {
+        showToast('This room is at full capacity', 'error');
+        return;
+      }
+
+      // Check gender compatibility
+      const student = students.find(s => s.id === sid);
+      if (building.gender !== 'Mixed' && student.gender !== building.gender) {
+        showToast(`This room is for ${building.gender} students only`, 'error');
+        return;
+      }
+
+      const s = students.find(x => x.id === sid);
+      if (s) {
+        s.building = bld;
+        s.dorm = room;
+        s.capacity = building.capacity;
+        saveStudents(students);
+        showToast('Dorm assigned successfully', 'success');
+        renderAdminTable();
+        renderBuildingsList();
+        document.getElementById('assignForm').reset();
+      }
+    }
+
+    function updateRoomOptions() {
+      const selectedBuilding = document.getElementById('assign-building').value;
+      const roomSelect = document.getElementById('assign-room');
+      roomSelect.innerHTML = '<option value="">Select Room</option>';
+
+      if (!selectedBuilding) return;
+
+      const buildings = getBuildings();
+      const rooms = buildings.filter(b => b.building === selectedBuilding);
+
+      rooms.forEach(b => {
+        const students = getStudents();
+        const occupied = students.filter(s => s.building === b.building && s.dorm === b.room).length;
+        const available = b.capacity - occupied;
+        const status = available > 0 ? `(${available}/${b.capacity})` : '(Full)';
+        
+        const option = document.createElement('option');
+        option.value = b.room;
+        option.textContent = `Room ${b.room} - ${b.gender} ${status}`;
+        option.disabled = available <= 0;
+        roomSelect.appendChild(option);
+      });
+    }
+
+    function populateBuildingSelect() {
+      const buildingSelect = document.getElementById('assign-building');
+      buildingSelect.innerHTML = '<option value="">Select Building</option>';
+
+      const buildings = getBuildings();
+      const uniqueBuildings = [...new Set(buildings.map(b => b.building))];
+
+      uniqueBuildings.forEach(bld => {
+        const option = document.createElement('option');
+        option.value = bld;
+        option.textContent = bld;
+        buildingSelect.appendChild(option);
+      });
+    }
+
+    function exportReport() {
+      const students = getStudents();
+      let csv = 'ID,Name,Department,Gender,Building,Dorm\n';
+      students.forEach(s => {
+        csv += `${s.id},${s.name},${s.department},${s.gender},${s.building || '-'},${s.dorm || '-'}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'dms_report_' + new Date().toISOString().split('T')[0] + '.csv';
+      a.click();
+      showToast('Report exported successfully', 'success');
+    }
+
+    function saveSettings() {
+      showToast('Settings saved successfully', 'success');
+    }
+
+    // Search functionality
+    document.getElementById('studentSearch')?.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const rows = document.querySelectorAll('#admin-student-list tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+      });
+    });
+
+    // Initialize
+    document.getElementById('lastUpdated').value = new Date().toLocaleString();
+    renderAdminTable();
+    renderAdminReports();
+    renderBuildingsList();
+
+    // Auto-refresh reports every 2 seconds
+    setInterval(() => {
+      renderAdminReports();
+      updateStats();
+    }, 2000);
+
+    function refreshReports() {
+      renderAdminReports();
+      showToast('Reports refreshed', 'info');
+    }
+
+    function renderBuildingsList() {
+      const buildings = getBuildings();
+      const tbody = document.getElementById('buildings-list');
+      tbody.innerHTML = '';
+
+      if (buildings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);"><i class="fa-solid fa-inbox" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>No buildings added yet</td></tr>';
+        return;
+      }
+
+      buildings.forEach((b, idx) => {
+        const students = getStudents();
+        let occupied = 0;
+        
+        // Count occupied dorms in this building
+        for (let dorm = 1; dorm <= b.totalDorms; dorm++) {
+          const count = students.filter(s => s.building === b.name && s.dorm === dorm).length;
+          occupied += Math.ceil(count / b.capacity);
+        }
+
+        const available = b.totalDorms - occupied;
+        const statusColor = available > 0 ? 'green' : 'orange';
+
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${b.name}</strong></td>
+            <td>${b.totalDorms}</td>
+            <td>${b.capacity} Person(s)</td>
+            <td><span class="badge badge-cyan">${b.gender}</span></td>
+            <td>${occupied}</td>
+            <td><span class="badge badge-${statusColor}">${available}</span></td>
+            <td>
+              <button class="btn btn-ghost btn-sm" onclick="editBuilding(${idx})" title="Edit">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="deleteBuilding(${idx})" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function handleAddBuilding(e) {
+      e.preventDefault();
+      const name = document.getElementById('building-name').value;
+      const totalDorms = parseInt(document.getElementById('total-dorms').value);
+      const capacity = parseInt(document.getElementById('dorm-capacity').value);
+      const gender = document.getElementById('building-gender').value;
+
+      const buildings = getBuildings();
+      
+      // Check if building already exists
+      if (buildings.find(b => b.name === name)) {
+        showToast('This building already exists', 'error');
+        return;
+      }
+
+      buildings.push({
+        id: 'BLD-' + Date.now(),
+        name,
+        totalDorms,
+        capacity,
+        gender,
+        createdAt: new Date().toLocaleString()
+      });
+
+      saveBuildings(buildings);
+      showToast('Building added successfully', 'success');
+      document.getElementById('buildingForm').reset();
+      renderBuildingsList();
+      populateBuildingSelect();
+    }
+
+    function deleteBuilding(idx) {
+      if (confirm('Are you sure you want to delete this building? All dorms will be removed.')) {
+        const buildings = getBuildings();
+        const building = buildings[idx];
+        
+        // Check if any dorms are occupied
+        const students = getStudents();
+        const occupied = students.filter(s => s.building === building.name).length;
+        
+        if (occupied > 0) {
+          showToast('Cannot delete building with occupied dorms. Reassign students first.', 'error');
+          return;
+        }
+
+        buildings.splice(idx, 1);
+        saveBuildings(buildings);
+        showToast('Building deleted successfully', 'success');
+        renderBuildingsList();
+        populateBuildingSelect();
+      }
+    }
+
+    function editBuilding(idx) {
+      const buildings = getBuildings();
+      const b = buildings[idx];
+
+      document.getElementById('editBuildingIndex').value = idx;
+      document.getElementById('edit-building-name').value = b.name;
+      document.getElementById('edit-total-dorms').value = b.totalDorms;
+      document.getElementById('edit-dorm-capacity').value = b.capacity;
+      document.getElementById('edit-building-gender').value = b.gender;
+
+      document.getElementById('editBuildingModalOverlay').classList.add('active');
+    }
+
+    function handleEditBuilding(e) {
+      e.preventDefault();
+      const idx = document.getElementById('editBuildingIndex').value;
+      const name = document.getElementById('edit-building-name').value;
+      const totalDorms = parseInt(document.getElementById('edit-total-dorms').value);
+      const capacity = parseInt(document.getElementById('edit-dorm-capacity').value);
+      const gender = document.getElementById('edit-building-gender').value;
+
+      const buildings = getBuildings();
+      const building = buildings[idx];
+
+      // Check if name changed and already exists
+      if (name !== building.name && buildings.find(b => b.name === name)) {
+        showToast('Building name already exists', 'error');
+        return;
+      }
+
+      // If reducing total dorms, check if occupied dorms exceed new total
+      if (totalDorms < building.totalDorms) {
+        const students = getStudents();
+        const maxOccupiedDorm = Math.max(...students.filter(s => s.building === building.name).map(s => s.dorm || 0));
+        
+        if (maxOccupiedDorm > totalDorms) {
+          showToast(`Cannot reduce dorms below ${maxOccupiedDorm}. Students are assigned to higher dorm numbers.`, 'error');
+          return;
+        }
+      }
+
+      // Update building
+      building.name = name;
+      building.totalDorms = totalDorms;
+      building.capacity = capacity;
+      building.gender = gender;
+
+      saveBuildings(buildings);
+      showToast('Building updated successfully', 'success');
+      renderBuildingsList();
+      populateBuildingSelect();
+      closeModal('editBuildingModalOverlay');
+    }
+
+    function updateDormOptions() {
+      const selectedBuilding = document.getElementById('assign-building').value;
+      const dormSelect = document.getElementById('assign-dorm');
+      dormSelect.innerHTML = '<option value="">Select Dorm</option>';
+
+      if (!selectedBuilding) return;
+
+      const buildings = getBuildings();
+      const building = buildings.find(b => b.name === selectedBuilding);
+
+      if (!building) return;
+
+      const students = getStudents();
+
+      // Generate dorm numbers 1 to totalDorms
+      for (let dorm = 1; dorm <= building.totalDorms; dorm++) {
+        const occupants = students.filter(s => s.building === building.name && s.dorm === dorm).length;
+        const available = building.capacity - occupants;
+        const status = available > 0 ? `(${available}/${building.capacity})` : '(Full)';
+        
+        const option = document.createElement('option');
+        option.value = dorm;
+        option.textContent = `Dorm ${dorm} ${status}`;
+        option.disabled = available <= 0;
+        dormSelect.appendChild(option);
+      }
+    }
+
+    function populateBuildingSelect() {
+      const buildingSelect = document.getElementById('assign-building');
+      buildingSelect.innerHTML = '<option value="">Select Building</option>';
+
+      const buildings = getBuildings();
+      buildings.forEach(b => {
+        const option = document.createElement('option');
+        option.value = b.name;
+        option.textContent = b.name;
+        buildingSelect.appendChild(option);
+      });
+    }
+
+    function handleAssign(e) {
+      e.preventDefault();
+      const sid = document.getElementById('assign-student-id').value;
+      const buildingName = document.getElementById('assign-building').value;
+      const dormNum = parseInt(document.getElementById('assign-dorm').value);
+
+      if (!sid || !buildingName || !dormNum) {
+        showToast('Please fill all fields', 'error');
+        return;
+      }
+
+      const buildings = getBuildings();
+      const building = buildings.find(b => b.name === buildingName);
+      
+      if (!building) {
+        showToast('Invalid building selection', 'error');
+        return;
+      }
+
+      // Check capacity
+      const students = getStudents();
+      const occupants = students.filter(s => s.building === buildingName && s.dorm === dormNum).length;
+      
+      if (occupants >= building.capacity) {
+        showToast('This dorm is at full capacity', 'error');
+        return;
+      }
+
+      // Check gender compatibility
+      const student = students.find(s => s.id === sid);
+      if (student.gender !== building.gender) {
+        showToast(`This building is for ${building.gender} students only`, 'error');
+        return;
+      }
+
+      const s = students.find(x => x.id === sid);
+      if (s) {
+        s.building = buildingName;
+        s.dorm = dormNum;
+        s.capacity = building.capacity;
+        saveStudents(students);
+        showToast('Dorm assigned successfully', 'success');
+        renderAdminTable();
+        renderBuildingsList();
+        document.getElementById('assignForm').reset();
+      }
+    }
+
+    function renderAdminReports() {
+      const reports = getReports();
+      const tbody = document.getElementById('admin-reports-list');
+      tbody.innerHTML = '';
+
+      if (reports.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);"><i class="fa-solid fa-inbox" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>No reports submitted</td></tr>';
+        return;
+      }
+
+      reports.forEach((r, idx) => {
+        const statusColor = r.status === 'Pending' ? 'orange' : r.status === 'In Review' ? 'cyan' : r.status === 'Resolved' ? 'green' : 'purple';
+        tbody.innerHTML += `
+          <tr>
+            <td>${r.id}</td>
+            <td>${r.studentName}</td>
+            <td><span class="badge badge-cyan">${r.type}</span></td>
+            <td>${r.subject}</td>
+            <td><span class="badge badge-${statusColor}">${r.status}</span></td>
+            <td style="font-size: 12px;">${r.date}</td>
+            <td>
+              <button class="btn btn-ghost btn-sm" onclick="openReportReview(${idx})" title="Review">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      updateStats();
+    }
+
+    function openReportReview(idx) {
+      const reports = getReports();
+      const r = reports[idx];
+
+      document.getElementById('reviewReportId').value = idx;
+      document.getElementById('reviewStudentName').value = r.studentName;
+      document.getElementById('reviewReportType').value = r.type;
+      document.getElementById('reviewReportSubject').value = r.subject;
+      document.getElementById('reviewReportDesc').value = r.description;
+      document.getElementById('reviewReportStatus').value = r.status;
+      document.getElementById('reviewReportComment').value = r.adminComment || '';
+
+      document.getElementById('reportModalOverlay').classList.add('active');
+    }
+
+    function handleReportReview(e) {
+      e.preventDefault();
+      const idx = document.getElementById('reviewReportId').value;
+      const status = document.getElementById('reviewReportStatus').value;
+      const comment = document.getElementById('reviewReportComment').value;
+
+      const reports = getReports();
+      reports[idx].status = status;
+      reports[idx].adminComment = comment;
+
+      saveReports(reports);
+      showToast('Report updated successfully', 'success');
+      renderAdminReports();
+      closeModal('reportModalOverlay');
+    }
+  </script>
+</body>
+</html>
