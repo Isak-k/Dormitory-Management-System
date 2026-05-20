@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard - DMS</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="bg-animated">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2 class="gradient-text" style="font-family: 'Orbitron'; font-size: 22px;">
+          <i class="fa-solid fa-graduation-cap"></i> Student Portal
+        </h2>
+      </div>
+
+      <div style="text-align: center; margin: 15px 0; padding: 0 15px;">
+        <div class="avatar-placeholder" style="width: 60px; height: 60px; margin: 0 auto 8px; font-size: 24px;">S</div>
+        <div id="st-name" style="font-weight: 600; color: #fff; font-size: 14px;">Student Name</div>
+        <div id="st-id" style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">ID: -</div>
+        <div id="st-dept" style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;">Department</div>
+      </div>
+
+      <nav class="sidebar-nav">
+
+        <a class="nav-link active" onclick="switchStudentSection('overview')">
+          <i class="fa-solid fa-home"></i> My Dorm
+        </a>
+        <a class="nav-link" onclick="switchStudentSection('reports')">
+          <i class="fa-solid fa-file-alt"></i> Reports
+        </a>
+        <a class="nav-link" onclick="switchStudentSection('maintenance')">
+          <i class="fa-solid fa-wrench"></i> Maintenance
+        </a>
+        <a class="nav-link" onclick="switchStudentSection('fees')">
+          <i class="fa-solid fa-file-invoice"></i> Fees
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-danger btn-full" onclick="logout()">
+          <i class="fa-solid fa-power-off"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="topbar">
+        <div style="font-size: 20px; font-weight: 600;">
+          <i class="fa-solid fa-chart-line"></i> Welcome back!
+        </div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+          <div id="current-time" style="font-size: 13px; color: var(--text-secondary);">--:--</div>
+          <button class="btn btn-ghost btn-sm dark-mode-toggle">
+            <i class="fa-solid fa-sun"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <!-- Overview Section -->
+        <section id="overview" class="student-section active">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fa-solid fa-door-open"></i> My Dorm Information
+            </h2>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <!-- Dorm Info Card -->
+            <div class="glass-card" style="padding: 30px;">
+              <h3 class="neon-text" style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fa-solid fa-building"></i> Room Details
+              </h3>
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--glass-border);">
+                  <span style="color: var(--text-secondary); font-size: 13px;">Building</span>
+                  <span id="disp-building" style="font-weight: 600; color: #fff;">Not Assigned</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--glass-border);">
+                  <span style="color: var(--text-secondary); font-size: 13px;">Room Number</span>
+                  <span id="disp-room" style="font-weight: 600; font-size: 18px; color: var(--accent-cyan);">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--glass-border);">
+                  <span style="color: var(--text-secondary); font-size: 13px;">Capacity</span>
+                  <span id="disp-capacity" style="font-weight: 600; color: #fff;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                  <span style="color: var(--text-secondary); font-size: 13px;">Status</span>
+                  <span id="disp-status" style="font-weight: 600; color: var(--accent-green);">
+                    <i class="fa-solid fa-check-circle"></i> Assigned
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Personal Info Card -->
+            <div class="glass-card" style="padding: 30px;">
+              <h3 class="neon-text" style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fa-solid fa-user"></i> Personal Information
+              </h3>
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--glass-border);">
+                  <span style="color: var(--text-secondary); font-size: 13px;">Student ID</span>
+                  <span id="disp-id" style="font-weight: 600; color: #fff;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--glass-border);">
+                  <span style="color: var(--text-secondary); font-size: 13px;">Full Name</span>
+                  <span id="disp-name" style="font-weight: 600; color: #fff;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--glass-border);">
+                  <span style="color: var(--text-secondary); font-size: 13px;">Department</span>
+                  <span id="disp-dept" style="font-weight: 600; color: #fff;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                  <span style="color: var(--text-secondary); font-size: 13px;">Gender</span>
+                  <span id="disp-gender" style="font-weight: 600; color: #fff;">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Maintenance Section -->
+        <section id="maintenance" class="student-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fa-solid fa-wrench"></i> Maintenance Requests
+            </h2>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <!-- Submit Request -->
+            <div class="glass-card" style="padding: 30px;">
+              <h3 class="gradient-text" style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fa-solid fa-plus-circle"></i> Submit Request
+              </h3>
+              <form id="maintenanceForm" onsubmit="handleMaintenanceSubmit(event)">
+                <div class="form-group">
+                  <label class="form-label">Issue Category</label>
+                  <select id="issue-category" class="form-select" required>
+                    <option value="">Select Category</option>
+                    <option value="Plumbing">Plumbing</option>
+                    <option value="Electrical">Electrical</option>
+                    <option value="Furniture">Furniture</option>
+                    <option value="Cleaning">Cleaning</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Issue Description</label>
+                  <textarea id="issue-description" class="form-textarea" placeholder="Describe the issue in detail..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Priority</label>
+                  <select id="issue-priority" class="form-select" required>
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                  <i class="fa-solid fa-paper-plane"></i> Submit Request
+                </button>
+              </form>
+            </div>
+
+            <!-- My Requests -->
+            <div class="glass-card" style="padding: 30px;">
+              <h3 class="gradient-text" style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fa-solid fa-list-check"></i> My Requests
+              </h3>
+              <div id="my-requests-list" style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                  <i class="fa-solid fa-inbox" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                  No requests yet
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Fees Section -->
+        <section id="fees" class="student-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fa-solid fa-file-invoice"></i> Fees & Payments
+            </h2>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div class="glass-card" style="padding: 30px;">
+              <h3 class="neon-text" style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fa-solid fa-money-bill"></i> Accommodation Fee
+              </h3>
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--glass-border);">
+                  <span style="color: var(--text-secondary);">Amount</span>
+                  <span style="font-weight: 600; color: #fff;">$500.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--glass-border);">
+                  <span style="color: var(--text-secondary);">Status</span>
+                  <span style="font-weight: 600; color: var(--accent-green);">
+                    <i class="fa-solid fa-check-circle"></i> Paid
+                  </span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                  <span style="color: var(--text-secondary);">Due Date</span>
+                  <span style="font-weight: 600; color: #fff;">Dec 31, 2026</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card" style="padding: 30px;">
+              <h3 class="neon-text" style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fa-solid fa-receipt"></i> Payment History
+              </h3>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="padding: 12px; background: rgba(16,185,129,0.1); border-radius: var(--border-radius-sm); border-left: 3px solid var(--accent-green);">
+                  <div style="font-size: 12px; color: var(--text-secondary);">May 2026</div>
+                  <div style="font-weight: 600; color: #fff;">$500.00 - Paid</div>
+                </div>
+                <div style="padding: 12px; background: rgba(16,185,129,0.1); border-radius: var(--border-radius-sm); border-left: 3px solid var(--accent-green);">
+                  <div style="font-size: 12px; color: var(--text-secondary);">January 2026</div>
+                  <div style="font-weight: 600; color: #fff;">$500.00 - Paid</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reports" class="student-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fa-solid fa-file-alt"></i> My Reports
+            </h2>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <!-- Submit Report -->
+            <div class="glass-card" style="padding: 30px;">
+              <h3 class="gradient-text" style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fa-solid fa-pen-to-square"></i> Submit Report
+              </h3>
+              <form id="reportForm" onsubmit="handleReportSubmit(event)">
+                <div class="form-group">
+                  <label class="form-label">Report Type</label>
+                  <select id="report-type" class="form-select" required>
+                    <option value="">Select Type</option>
+                    <option value="Complaint">Complaint</option>
+                    <option value="Damage">Damage Report</option>
+                    <option value="Safety">Safety Issue</option>
+                    <option value="Noise">Noise Complaint</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Subject</label>
+                  <input type="text" id="report-subject" class="form-input" placeholder="Brief subject..." required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Description</label>
+                  <textarea id="report-description" class="form-textarea" placeholder="Provide detailed information..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                  <i class="fa-solid fa-paper-plane"></i> Submit Report
+                </button>
+              </form>
+            </div>
+
+            <!-- My Reports -->
+            <div class="glass-card" style="padding: 30px;">
+              <h3 class="gradient-text" style="margin-bottom: 20px; font-size: 18px;">
+                <i class="fa-solid fa-list"></i> My Reports
+              </h3>
+              <div id="my-reports-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto;">
+                <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                  <i class="fa-solid fa-inbox" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                  No reports yet
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Report Details View -->
+          <div id="report-details-section" style="display: none; margin-top: 24px;">
+            <div class="glass-card" style="padding: 30px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 class="gradient-text" style="font-size: 18px;">
+                  <i class="fa-solid fa-comments"></i> Report Details
+                </h3>
+                <button class="btn btn-ghost btn-sm" onclick="closeReportDetails()">
+                  <i class="fa-solid fa-times"></i> Close
+                </button>
+              </div>
+
+              <div id="report-conversation" style="display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto;">
+              </div>
+
+              <div id="admin-reply-section" style="display: none; margin-top: 20px; padding: 16px; background: rgba(0,212,255,0.05); border-radius: var(--border-radius-sm); border-left: 3px solid var(--accent-cyan);">
+                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;"><i class="fa-solid fa-reply"></i> Admin Response:</div>
+                <div id="admin-reply-text" style="color: #fff; font-size: 14px; line-height: 1.5;"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Security Check
+    const user = getCurrentUser();
+    if (!user || user.role !== 'student') window.location.href = 'login.html';
+
+    const students = getStudents();
+    const myData = students.find(s => s.id === user.id) || user;
+
+    // Update sidebar
+    document.getElementById('st-name').innerText = myData.name;
+    document.getElementById('st-id').innerText = 'ID: ' + myData.id;
+    document.getElementById('st-dept').innerText = myData.department || 'Department';
+
+    // Update overview section
+    document.getElementById('disp-id').innerText = myData.id;
+    document.getElementById('disp-name').innerText = myData.name;
+    document.getElementById('disp-dept').innerText = myData.department || '-';
+    document.getElementById('disp-gender').innerText = myData.gender || '-';
+    document.getElementById('disp-building').innerText = myData.building || 'Not Assigned';
+    document.getElementById('disp-room').innerText = myData.dorm || 'Not Assigned';
+    document.getElementById('disp-capacity').innerText = (myData.capacity || '-') + ' Person(s)';
+
+    if (!myData.dorm) {
+      document.getElementById('disp-status').innerHTML = '<i class="fa-solid fa-exclamation-circle"></i> Pending';
+      document.getElementById('disp-status').style.color = 'var(--accent-orange)';
+    }
+
+    function switchStudentSection(id) {
+      document.querySelectorAll('.student-section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('.sidebar-nav .nav-link').forEach(l => l.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+    }
+
+    function handleMaintenanceSubmit(e) {
+      e.preventDefault();
+      const category = document.getElementById('issue-category').value;
+      const description = document.getElementById('issue-description').value;
+      const priority = document.getElementById('issue-priority').value;
+
+      const requests = getRequests();
+      requests.push({
+        id: 'REQ-' + Date.now(),
+        studentId: user.id,
+        studentName: myData.name,
+        category,
+        description,
+        priority,
+        status: 'Pending',
+        date: new Date().toLocaleString()
+      });
+
+      saveRequests(requests);
+      showToast('Maintenance request submitted successfully!', 'success');
+      document.getElementById('maintenanceForm').reset();
+      renderMyRequests();
+    }
+
+    function renderMyRequests() {
+      const requests = getRequests();
+      const myRequests = requests.filter(r => r.studentId === user.id);
+      const container = document.getElementById('my-requests-list');
+
+      if (myRequests.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-muted);"><i class="fa-solid fa-inbox" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>No requests yet</div>';
+        return;
+      }
+
+      container.innerHTML = myRequests.map(r => `
+        <div style="padding: 12px; background: rgba(0,212,255,0.05); border-radius: var(--border-radius-sm); border-left: 3px solid var(--accent-cyan);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-weight: 600; color: #fff;">${r.category}</span>
+            <span class="badge badge-${r.priority === 'High' ? 'orange' : r.priority === 'Medium' ? 'cyan' : 'green'}">${r.priority}</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-secondary);">${r.description.substring(0, 50)}...</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">${r.date}</div>
+        </div>
+      `).join('');
+    }
+
+    // Update time
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('current-time').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // Initialize
+    renderMyRequests();
+
+    function handleReportSubmit(e) {
+      e.preventDefault();
+      const type = document.getElementById('report-type').value;
+      const subject = document.getElementById('report-subject').value;
+      const description = document.getElementById('report-description').value;
+
+      const reports = getReports();
+      reports.push({
+        id: 'RPT-' + Date.now(),
+        studentId: user.id,
+        studentName: myData.name,
+        type,
+        subject,
+        description,
+        status: 'Pending',
+        adminComment: '',
+        date: new Date().toLocaleString()
+      });
+
+      saveReports(reports);
+      showToast('Report submitted successfully!', 'success');
+      document.getElementById('reportForm').reset();
+      renderMyReports();
+    }
+
+    function renderMyReports() {
+      const reports = getReports();
+      const myReports = reports.filter(r => r.studentId === user.id);
+      const container = document.getElementById('my-reports-list');
+
+      if (myReports.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-muted);"><i class="fa-solid fa-inbox" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>No reports yet</div>';
+        return;
+      }
+
+      container.innerHTML = myReports.map((r, idx) => {
+        const statusColor = r.status === 'Pending' ? 'orange' : r.status === 'In Review' ? 'cyan' : r.status === 'Resolved' ? 'green' : 'purple';
+        const hasReply = r.adminComment && r.adminComment.trim().length > 0;
+        
+        return `
+          <div style="padding: 12px; background: rgba(0,212,255,0.05); border-radius: var(--border-radius-sm); border-left: 3px solid var(--accent-cyan); cursor: pointer;" onclick="viewReportDetails(${idx})">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-weight: 600; color: #fff;">${r.type}</span>
+              <span class="badge badge-${statusColor}">${r.status}</span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-secondary);">${r.subject}</div>
+            ${hasReply ? `<div style="font-size: 11px; color: var(--accent-cyan); margin-top: 6px;"><i class="fa-solid fa-reply"></i> Admin replied</div>` : ''}
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">${r.date}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function viewReportDetails(idx) {
+      const reports = getReports();
+      const myReports = reports.filter(r => r.studentId === user.id);
+      const report = myReports[idx];
+
+      // Show conversation
+      const conversation = document.getElementById('report-conversation');
+      conversation.innerHTML = `
+        <div style="padding: 12px; background: rgba(124,58,237,0.1); border-radius: var(--border-radius-sm); border-left: 3px solid var(--accent-purple);">
+          <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">Your Report</div>
+          <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">${report.subject}</div>
+          <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">${report.description}</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 8px;">${report.date}</div>
+        </div>
+      `;
+
+      // Show admin reply if exists
+      const replySection = document.getElementById('admin-reply-section');
+      if (report.adminComment && report.adminComment.trim().length > 0) {
+        document.getElementById('admin-reply-text').innerHTML = report.adminComment;
+        replySection.style.display = 'block';
+      } else {
+        replySection.style.display = 'none';
+      }
+
+      // Show status
+      const statusColor = report.status === 'Pending' ? 'orange' : report.status === 'In Review' ? 'cyan' : report.status === 'Resolved' ? 'green' : 'purple';
+      conversation.innerHTML += `
+        <div style="padding: 12px; background: rgba(0,212,255,0.05); border-radius: var(--border-radius-sm); border-left: 3px solid var(--accent-cyan); text-align: center;">
+          <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">Current Status</div>
+          <span class="badge badge-${statusColor}" style="font-size: 13px; padding: 6px 12px;">${report.status}</span>
+        </div>
+      `;
+    }
+
+    function closeReportDetails() {
+      document.getElementById('report-details-section').style.display = 'none';
+    }
+
+    renderMyReports();
+  </script>
+</body>
+</html>
