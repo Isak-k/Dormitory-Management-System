@@ -270,25 +270,41 @@ function renderAdminTable() {
 
 function updateStudentOptions() {
   const selectedDept = document.getElementById('assign-department').value;
+  const selectedGender = document.getElementById('assign-gender').value;
   const studentSelect = document.getElementById('assign-student-id');
   studentSelect.innerHTML = '<option value="">Choose Student...</option>';
 
-  if (!selectedDept) return;
+  if (!selectedDept || !selectedGender) return;
 
   const students = getStudents();
-  const unassignedStudents = students.filter(s => s.department === selectedDept && !s.dorm);
+  const filteredStudents = students.filter(s => s.department === selectedDept && s.gender === selectedGender);
 
-  if (unassignedStudents.length === 0) {
-    studentSelect.innerHTML = '<option value="" disabled>No available students in this department.</option>';
+  if (filteredStudents.length === 0) {
+    studentSelect.innerHTML = '<option value="" disabled>No students found in this department and gender.</option>';
     return;
   }
 
-  unassignedStudents.forEach(s => {
+  filteredStudents.forEach(s => {
     const option = document.createElement('option');
     option.value = s.id;
-    option.textContent = `${s.name} (${s.id})`;
+    option.textContent = `${s.name} (${s.id}) - ${s.dorm ? `Assigned to ${s.building} Dorm ${s.dorm}` : 'Unassigned'}`;
     studentSelect.appendChild(option);
   });
+}
+
+function loadCurrentAssignment() {
+  const studentId = document.getElementById('assign-student-id').value;
+  if (!studentId) return;
+
+  const students = getStudents();
+  const student = students.find(s => s.id === studentId);
+  if (student) {
+    document.getElementById('assign-building').value = student.building || '';
+    updateDormOptions();
+    if (student.dorm) {
+      document.getElementById('assign-dorm').value = student.dorm;
+    }
+  }
 }
 
 function openAddModal() {
@@ -443,8 +459,11 @@ function populateBuildingSelect() {
   const buildingSelect = document.getElementById('assign-building');
   buildingSelect.innerHTML = '<option value="">Select Building</option>';
 
+  const selectedGender = document.getElementById('assign-gender').value;
   const buildings = getBuildings();
-  buildings.forEach(b => {
+  const filteredBuildings = selectedGender ? buildings.filter(b => b.gender === selectedGender) : buildings;
+  
+  filteredBuildings.forEach(b => {
     const option = document.createElement('option');
     option.value = b.name;
     option.textContent = b.name;
