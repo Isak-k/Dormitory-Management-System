@@ -233,6 +233,13 @@
 
   <div id="toast-container"></div>
 
+  <!-- Top bar for dark mode toggle -->
+  <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+    <button class="btn btn-ghost btn-sm dark-mode-toggle" style="backdrop-filter: blur(10px); background: var(--glass); border: 1px solid var(--glass-border);">
+      <i class="fa-solid fa-sun"></i>
+    </button>
+  </div>
+
   <div class="login-container">
     <div class="login-card glass-card">
       <div class="login-header">
@@ -277,33 +284,6 @@
           <i class="fa-solid fa-rotate-left"></i> Clear
         </button>
       </form>
-
-      <div class="login-divider">
-        <span>Demo Credentials</span>
-      </div>
-
-      <div class="demo-creds">
-        <div class="demo-cred-item">
-          <strong>Admin:</strong>
-          <code>admin / 3265/17</code>
-        </div>
-        <div class="demo-cred-item">
-          <strong>Student 1 (by ID):</strong>
-          <code>3265/17 / 3265/17</code>
-        </div>
-        <div class="demo-cred-item">
-          <strong>Student 1 (by name):</strong>
-          <code>Usama Awol / 3265/17</code>
-        </div>
-        <div class="demo-cred-item">
-          <strong>Student 2 (by ID):</strong>
-          <code>1580/17 / 1580/17</code>
-        </div>
-        <div class="demo-cred-item">
-          <strong>Student 2 (by name):</strong>
-          <code>Hisak Kedi / 1580/17</code>
-        </div>
-      </div>
 
       <div class="login-footer">
         <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
