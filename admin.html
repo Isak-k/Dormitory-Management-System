@@ -298,62 +298,96 @@
             <form id="assignForm" onsubmit="handleAssign(event)">
               <div class="form-group">
                 <label class="form-label">Mode</label>
-                <select id="assign-mode" class="form-select" required onchange="updateStudentOptions(); loadCurrentAssignment();">
+                <select id="assign-mode" class="form-select" required onchange="handleModeChange();">
                   <option value="assign">Assign Dorm (Unassigned Students)</option>
                   <option value="update">Update Dorm (Assigned Students)</option>
+                  <option value="auto">Auto Assign (Bulk)</option>
                 </select>
               </div>
 
-              <div class="form-group">
-                <label class="form-label">Select Department</label>
-                <select id="assign-department" class="form-select" required onchange="updateStudentOptions()">
-                  <option value="">Select Department</option>
-                </select>
-              </div>
+              <!-- Auto Assign Section -->
+              <div id="auto-assign-section" style="display: none;">
+                <div class="form-group">
+                  <label class="form-label">Select Department</label>
+                  <select id="auto-department" class="form-select" required onchange="">
+                    <option value="">Select Department</option>
+                  </select>
+                </div>
 
-              <div class="form-group">
-                <label class="form-label">Select Gender</label>
-                <select id="assign-gender" class="form-select" required onchange="updateStudentOptions(); populateBuildingSelect();">
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
-              </div>
+                <div class="form-group">
+                  <label class="form-label">Select Gender</label>
+                  <select id="auto-gender" class="form-select" required onchange="populateAutoBuildingSelect();">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
 
-              <div class="form-group">
-                <label class="form-label">Search Student (ID or Name)</label>
-                <input type="text" id="assign-student-search" class="form-input" placeholder="Search by ID or name..." oninput="updateStudentOptions()">
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Select Student</label>
-                <select id="assign-student-id" class="form-select" required onchange="loadCurrentAssignment()">
-                  <option value="">Choose Student...</option>
-                </select>
-              </div>
-
-              <div style="display: flex; gap: 15px;">
-                <div class="form-group" style="flex: 1;">
-                  <label class="form-label">Building</label>
-                  <select id="assign-building" class="form-select" required onchange="updateDormOptions()">
+                <div class="form-group">
+                  <label class="form-label">Select Building</label>
+                  <select id="auto-building" class="form-select" required>
                     <option value="">Select Building</option>
                   </select>
                 </div>
-                <div class="form-group" style="flex: 1;">
-                  <label class="form-label">Dorm Number</label>
-                  <select id="assign-dorm" class="form-select" required>
-                    <option value="">Select Dorm</option>
-                  </select>
-                </div>
+
+                <button type="button" class="btn btn-green btn-full" onclick="handleAutoAssign()">
+                  <i class="fa-solid fa-magic"></i> Assign Automatically
+                </button>
               </div>
 
-              <div style="display: flex; gap: 10px;">
-                <button type="submit" class="btn btn-primary" style="flex: 1;">
-                  <i class="fa-solid fa-save"></i> Save Assignment
-                </button>
-                <button type="button" class="btn btn-orange" id="unassign-btn" style="flex: 1; display: none;" onclick="handleUnassign()">
-                  <i class="fa-solid fa-user-slash"></i> Unassign
-                </button>
+              <!-- Manual Assign Section -->
+              <div id="manual-assign-section" style="display: block;">
+                <div class="form-group">
+                  <label class="form-label">Select Department</label>
+                  <select id="assign-department" class="form-select" required onchange="updateStudentOptions()">
+                    <option value="">Select Department</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Select Gender</label>
+                  <select id="assign-gender" class="form-select" required onchange="updateStudentOptions(); populateBuildingSelect();">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Search Student (ID or Name)</label>
+                  <input type="text" id="assign-student-search" class="form-input" placeholder="Search by ID or name..." oninput="updateStudentOptions()">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Select Student</label>
+                  <select id="assign-student-id" class="form-select" required onchange="loadCurrentAssignment()">
+                    <option value="">Choose Student...</option>
+                  </select>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                  <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Building</label>
+                    <select id="assign-building" class="form-select" required onchange="updateDormOptions()">
+                      <option value="">Select Building</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Dorm Number</label>
+                    <select id="assign-dorm" class="form-select" required>
+                      <option value="">Select Dorm</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                  <button type="submit" class="btn btn-primary" style="flex: 1;">
+                    <i class="fa-solid fa-save"></i> Save Assignment
+                  </button>
+                  <button type="button" class="btn btn-orange" id="unassign-btn" style="flex: 1; display: none;" onclick="handleUnassign()">
+                    <i class="fa-solid fa-user-slash"></i> Unassign
+                  </button>
+                </div>
               </div>
             </form>
           </div>

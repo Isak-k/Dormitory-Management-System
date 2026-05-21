@@ -315,6 +315,119 @@ function updateStudentOptions() {
   });
 }
 
+function handleModeChange() {
+  const mode = document.getElementById('assign-mode').value;
+  const autoSection = document.getElementById('auto-assign-section');
+  const manualSection = document.getElementById('manual-assign-section');
+  
+  if (mode === 'auto') {
+    autoSection.style.display = 'block';
+    manualSection.style.display = 'none';
+    populateAutoDepartmentSelect();
+  } else {
+    autoSection.style.display = 'none';
+    manualSection.style.display = 'block';
+    updateStudentOptions();
+    loadCurrentAssignment();
+  }
+}
+
+function populateAutoDepartmentSelect() {
+  const departments = getDepartments();
+  const select = document.getElementById('auto-department');
+  select.innerHTML = '<option value="">Select Department</option>';
+  departments.forEach(dept => {
+    const option = document.createElement('option');
+    option.value = dept.name;
+    option.textContent = `${dept.code} - ${dept.name}`;
+    select.appendChild(option);
+  });
+}
+
+function populateAutoBuildingSelect() {
+  const selectedGender = document.getElementById('auto-gender').value;
+  const buildingSelect = document.getElementById('auto-building');
+  buildingSelect.innerHTML = '<option value="">Select Building</option>';
+
+  const buildings = getBuildings();
+  const filteredBuildings = selectedGender ? buildings.filter(b => b.gender === selectedGender) : buildings;
+  
+  filteredBuildings.forEach(b => {
+    const option = document.createElement('option');
+    option.value = b.name;
+    option.textContent = b.name;
+    buildingSelect.appendChild(option);
+  });
+}
+
+function handleAutoAssign() {
+  const dept = document.getElementById('auto-department').value;
+  const gender = document.getElementById('auto-gender').value;
+  const buildingName = document.getElementById('auto-building').value;
+
+  if (!dept || !gender || !buildingName) {
+    showToast('Please fill all fields', 'error');
+    return;
+  }
+
+  const students = getStudents();
+  const buildings = getBuildings();
+  const building = buildings.find(b => b.name === buildingName);
+
+  if (!building) {
+    showToast('Invalid building', 'error');
+    return;
+  }
+
+  // Get unassigned students in this dept and gender, sorted by name
+  let unassignedStudents = students.filter(s => 
+    s.department === dept && 
+    s.gender === gender && 
+    !s.dorm
+  ).sort((a, b) => a.name.localeCompare(b.name));
+
+  if (unassignedStudents.length === 0) {
+    showToast('No unassigned students in this department and gender', 'info');
+    return;
+  }
+
+  // Calculate total capacity
+  const totalCapacity = building.totalDorms * building.capacity;
+  const studentsToAssign = unassignedStudents.slice(0, totalCapacity);
+  const overflow = unassignedStudents.length - totalCapacity;
+
+  if (overflow > 0) {
+    showToast(`${overflow} student(s) exceed dorm capacity. They will remain unassigned.`, 'warning');
+  }
+
+  // Assign students
+  let currentDorm = 1;
+  let currentDormCount = 0;
+
+  studentsToAssign.forEach(student => {
+    const studentObj = students.find(s => s.id === student.id);
+    if (studentObj) {
+      studentObj.building = buildingName;
+      studentObj.dorm = String(currentDorm);
+      studentObj.capacity = String(building.capacity);
+      currentDormCount++;
+      
+      if (currentDormCount >= building.capacity) {
+        currentDorm++;
+        currentDormCount = 0;
+      }
+    }
+  });
+
+  saveStudents(students);
+  showToast(`Successfully assigned ${studentsToAssign.length} student(s)`, 'success');
+  
+  // Refresh all relevant sections
+  renderAdminTable();
+  renderBuildingsList();
+  updateDashboardOverview();
+}
+
 function loadCurrentAssignment() {
   const mode = document.getElementById('assign-mode').value;
   const studentId = document.getElementById('assign-student-id').value;
