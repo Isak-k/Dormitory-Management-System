@@ -426,6 +426,7 @@ function handleAutoAssign() {
   renderAdminTable();
   renderBuildingsList();
   updateDashboardOverview();
+  updateStudentOptions();
 }
 
 function loadCurrentAssignment() {
