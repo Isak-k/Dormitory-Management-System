@@ -298,7 +298,7 @@
             <form id="assignForm" onsubmit="handleAssign(event)">
               <div class="form-group">
                 <label class="form-label">Mode</label>
-                <select id="assign-mode" class="form-select" required onchange="updateStudentOptions();">
+                <select id="assign-mode" class="form-select" required onchange="updateStudentOptions(); loadCurrentAssignment();">
                   <option value="assign">Assign Dorm (Unassigned Students)</option>
                   <option value="update">Update Dorm (Assigned Students)</option>
                 </select>
@@ -347,9 +347,14 @@
                 </div>
               </div>
 
-              <button type="submit" class="btn btn-primary btn-full">
-                <i class="fa-solid fa-save"></i> Save Assignment
-              </button>
+              <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                  <i class="fa-solid fa-save"></i> Save Assignment
+                </button>
+                <button type="button" class="btn btn-orange" id="unassign-btn" style="flex: 1; display: none;" onclick="handleUnassign()">
+                  <i class="fa-solid fa-user-slash"></i> Unassign
+                </button>
+              </div>
             </form>
           </div>
         </section>

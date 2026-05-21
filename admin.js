@@ -316,8 +316,14 @@ function updateStudentOptions() {
 }
 
 function loadCurrentAssignment() {
+  const mode = document.getElementById('assign-mode').value;
   const studentId = document.getElementById('assign-student-id').value;
-  if (!studentId) return;
+  const unassignBtn = document.getElementById('unassign-btn');
+  
+  if (!studentId) {
+    unassignBtn.style.display = 'none';
+    return;
+  }
 
   const students = getStudents();
   const student = students.find(s => s.id === studentId);
@@ -327,6 +333,35 @@ function loadCurrentAssignment() {
     if (student.dorm) {
       document.getElementById('assign-dorm').value = String(student.dorm);
     }
+    
+    // Show unassign button only in update mode and if student is assigned
+    if (mode === 'update' && student.dorm) {
+      unassignBtn.style.display = 'block';
+    } else {
+      unassignBtn.style.display = 'none';
+    }
+  }
+}
+
+function handleUnassign() {
+  const studentId = document.getElementById('assign-student-id').value;
+  if (!studentId) return;
+  
+  if (!confirm('Are you sure you want to unassign this student from their dorm?')) return;
+
+  const students = getStudents();
+  const student = students.find(s => s.id === studentId);
+  if (student) {
+    student.building = '';
+    student.dorm = '';
+    student.capacity = '';
+    saveStudents(students);
+    showToast('Student unassigned successfully', 'success');
+    document.getElementById('assignForm').reset();
+    updateStudentOptions();
+    renderAdminTable();
+    renderBuildingsList();
+    updateDashboardOverview();
   }
 }
 
