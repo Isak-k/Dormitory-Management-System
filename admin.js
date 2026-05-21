@@ -269,18 +269,40 @@ function renderAdminTable() {
 }
 
 function updateStudentOptions() {
+  const mode = document.getElementById('assign-mode').value;
   const selectedDept = document.getElementById('assign-department').value;
   const selectedGender = document.getElementById('assign-gender').value;
+  const searchQuery = document.getElementById('assign-student-search').value.toLowerCase().trim();
   const studentSelect = document.getElementById('assign-student-id');
   studentSelect.innerHTML = '<option value="">Choose Student...</option>';
 
   if (!selectedDept || !selectedGender) return;
 
-  const students = getStudents();
-  const filteredStudents = students.filter(s => s.department === selectedDept && s.gender === selectedGender);
+  let students = getStudents();
+  let filteredStudents = students.filter(s => s.department === selectedDept && s.gender === selectedGender);
+
+  // Apply mode filter
+  if (mode === 'assign') {
+    filteredStudents = filteredStudents.filter(s => !s.dorm);
+  } else if (mode === 'update') {
+    filteredStudents = filteredStudents.filter(s => s.dorm);
+  }
+
+  // Apply search filter
+  if (searchQuery) {
+    filteredStudents = filteredStudents.filter(s => 
+      s.name.toLowerCase().includes(searchQuery) || s.id.toLowerCase().includes(searchQuery)
+    );
+  }
+
+  // Sort in ascending order by name
+  filteredStudents.sort((a, b) => a.name.localeCompare(b.name));
 
   if (filteredStudents.length === 0) {
-    studentSelect.innerHTML = '<option value="" disabled>No students found in this department and gender.</option>';
+    const message = mode === 'assign' 
+      ? 'No unassigned students found in this department and gender.' 
+      : 'No assigned students found in this department and gender.';
+    studentSelect.innerHTML = `<option value="" disabled>${message}</option>`;
     return;
   }
 

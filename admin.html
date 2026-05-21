@@ -297,6 +297,14 @@
           <div class="glass-card" style="padding: 30px; max-width: 600px;">
             <form id="assignForm" onsubmit="handleAssign(event)">
               <div class="form-group">
+                <label class="form-label">Mode</label>
+                <select id="assign-mode" class="form-select" required onchange="updateStudentOptions();">
+                  <option value="assign">Assign Dorm (Unassigned Students)</option>
+                  <option value="update">Update Dorm (Assigned Students)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
                 <label class="form-label">Select Department</label>
                 <select id="assign-department" class="form-select" required onchange="updateStudentOptions()">
                   <option value="">Select Department</option>
@@ -310,6 +318,11 @@
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                 </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Search Student (ID or Name)</label>
+                <input type="text" id="assign-student-search" class="form-input" placeholder="Search by ID or name..." oninput="updateStudentOptions()">
               </div>
 
               <div class="form-group">
