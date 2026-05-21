@@ -1056,3 +1056,93 @@ function handleReportReview(e) {
   renderAdminReports();
   closeModal('reportModalOverlay');
 }
+
+// ---- Notifications ----
+function toggleNotifications() {
+  const panel = document.getElementById('notificationPanel');
+  panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+  if (panel.style.display === 'block') {
+    updateNotifications();
+  }
+}
+
+function updateNotifications() {
+  const reports = getReports();
+  const requests = getRequests();
+  const notificationList = document.getElementById('notification-list');
+  const badge = document.getElementById('notification-badge');
+
+  let notifications = [];
+
+  // Add pending reports
+  reports.filter(r => r.status === 'Pending' || r.status === 'In Review').forEach(r => {
+    notifications.push({
+      type: 'report',
+      title: 'New Report',
+      message: `${r.studentName} submitted a ${r.type} report`,
+      time: r.createdAt,
+      id: r.id
+    });
+  });
+
+  // Add pending requests
+  requests.filter(r => r.status === 'Pending' || r.status === 'In Progress').forEach(r => {
+    notifications.push({
+      type: 'request',
+      title: 'New Maintenance Request',
+      message: `${r.studentName} reported: ${r.issue}`,
+      time: r.createdAt,
+      id: r.id
+    });
+  });
+
+  // Sort by time (newest first)
+  notifications.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+  // Update badge
+  const count = notifications.length;
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'flex' : 'none';
+
+  // Update notification list
+  if (notifications.length === 0) {
+    notificationList.innerHTML = `
+      <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 12px;">
+        <i class="fa-solid fa-inbox" style="font-size: 24px; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
+        No notifications
+      </div>
+    `;
+  } else {
+    notificationList.innerHTML = notifications.map(n => `
+      <div style="padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); cursor: pointer;" onclick="goToNotification('${n.type}')">
+        <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${n.title}</div>
+        <div style="font-size: 11px; color: var(--text-muted);">${n.message}</div>
+      </div>
+    `).join('');
+  }
+}
+
+function goToNotification(type) {
+  document.getElementById('notificationPanel').style.display = 'none';
+  if (type === 'report') {
+    switchSection('reports');
+  } else {
+    switchSection('maintenance');
+  }
+}
+
+// Close notification panel when clicking outside
+document.addEventListener('click', (e) => {
+  const dropdown = document.querySelector('.notification-dropdown');
+  const panel = document.getElementById('notificationPanel');
+  if (dropdown && !dropdown.contains(e.target)) {
+    panel.style.display = 'none';
+  }
+});
+
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  updateNotifications();
+  // Update notifications periodically every 30 seconds
+  setInterval(updateNotifications, 30000);
+});
