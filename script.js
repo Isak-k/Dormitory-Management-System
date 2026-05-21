@@ -5,9 +5,9 @@
 
 // ---- Default Students ----
 const DEFAULT_STUDENTS = [
-  { id: '3265/17', name: 'Usama Awol', department: 'Computer Science', gender: 'Male', building: 'Block A', dorm: '101', capacity: '2' },
-  { id: '1580/17', name: 'Hisak Kedi', department: 'Electrical Engineering', gender: 'Male', building: 'Block B', dorm: '205', capacity: '3' },
-  { id: '3445/17', name: 'Zinedin Mujibu', department: 'Civil Engineering', gender: 'Male', building: 'Block A', dorm: '110', capacity: '2' },
+  { id: '3265/17', name: 'Usama Awol', department: 'Computer Science', gender: 'Male', building: '', dorm: '', capacity: '' },
+  { id: '1580/17', name: 'Hisak Kedi', department: 'Electrical Engineering', gender: 'Male', building: '', dorm: '', capacity: '' },
+  { id: '3445/17', name: 'Zinedin Mujibu', department: 'Civil Engineering', gender: 'Male', building: '', dorm: '', capacity: '' },
 ];
 
 // ---- Default Admin ----
