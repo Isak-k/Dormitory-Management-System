@@ -942,6 +942,7 @@ function editBuilding(idx) {
   document.getElementById('editBuildingIndex').value = idx;
   document.getElementById('edit-building-name').value = b.name;
   document.getElementById('edit-total-dorms').value = b.totalDorms;
+  document.getElementById('edit-start-room').value = b.startRoom || 1;
   document.getElementById('edit-dorm-capacity').value = b.capacity;
   document.getElementById('edit-building-gender').value = b.gender;
 
@@ -953,6 +954,7 @@ function handleEditBuilding(e) {
   const idx = document.getElementById('editBuildingIndex').value;
   const name = document.getElementById('edit-building-name').value;
   const totalDorms = parseInt(document.getElementById('edit-total-dorms').value);
+  const startRoom = parseInt(document.getElementById('edit-start-room').value);
   const capacity = parseInt(document.getElementById('edit-dorm-capacity').value);
   const gender = document.getElementById('edit-building-gender').value;
 
@@ -965,12 +967,13 @@ function handleEditBuilding(e) {
     return;
   }
 
-  // If reducing total dorms, check if occupied dorms exceed new total
+  // If reducing total dorms, check if occupied dorms exceed new range
   if (totalDorms < building.totalDorms) {
     const students = getStudents();
-    const maxOccupiedDorm = Math.max(...students.filter(s => s.building === building.name).map(s => s.dorm || 0));
+    const maxOccupiedDorm = Math.max(...students.filter(s => s.building === building.name).map(s => parseInt(s.dorm) || 0));
+    const newLastDorm = startRoom + totalDorms - 1;
     
-    if (maxOccupiedDorm > totalDorms) {
+    if (maxOccupiedDorm > newLastDorm) {
       showToast(`Cannot reduce dorms below ${maxOccupiedDorm}. Students are assigned to higher dorm numbers.`, 'error');
       return;
     }
@@ -979,6 +982,7 @@ function handleEditBuilding(e) {
   // Update building
   building.name = name;
   building.totalDorms = totalDorms;
+  building.startRoom = startRoom;
   building.capacity = capacity;
   building.gender = gender;
 
