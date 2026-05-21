@@ -81,14 +81,22 @@ function saveReports(reports) {
   localStorage.setItem('dms_reports', JSON.stringify(reports));
 }
 
+// ---- Default Buildings ----
+const DEFAULT_BUILDINGS = [
+  { id: 'BLD-001', name: 'Block A', totalDorms: 50, capacity: 2, gender: 'Male', createdAt: new Date().toLocaleString() },
+  { id: 'BLD-002', name: 'Block B', totalDorms: 50, capacity: 3, gender: 'Male', createdAt: new Date().toLocaleString() },
+  { id: 'BLD-003', name: 'Block C', totalDorms: 40, capacity: 2, gender: 'Female', createdAt: new Date().toLocaleString() },
+];
+
 // ---- Get Buildings ----
 function getBuildings() {
   const stored = localStorage.getItem('dms_buildings');
   if (stored) {
     try { return JSON.parse(stored); }
-    catch { return []; }
+    catch { return DEFAULT_BUILDINGS; }
   }
-  return [];
+  localStorage.setItem('dms_buildings', JSON.stringify(DEFAULT_BUILDINGS));
+  return DEFAULT_BUILDINGS;
 }
 
 // ---- Save Buildings ----
