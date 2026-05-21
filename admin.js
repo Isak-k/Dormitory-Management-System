@@ -722,15 +722,14 @@ function handleAssign(e) {
   if (s) {
     s.building = buildingName;
     s.dorm = dormNum;
-    s.capacity = building.capacity;
+    s.capacity = String(building.capacity);
     saveStudents(students);
     showToast('Dorm assigned successfully', 'success');
     renderAdminTable();
     renderBuildingsList();
     updateStudentOptions();
-    document.getElementById('assignForm').reset();
-    populateDepartmentSelects();
     updateDashboardOverview();
+    updateDormOptions();
   }
 }
 
