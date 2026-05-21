@@ -319,17 +319,149 @@ function handleModeChange() {
   const mode = document.getElementById('assign-mode').value;
   const autoSection = document.getElementById('auto-assign-section');
   const manualSection = document.getElementById('manual-assign-section');
+  const bulkUnassignSection = document.getElementById('bulk-unassign-section');
+  const bulkChangeBuildingSection = document.getElementById('bulk-change-building-section');
+  
+  // Hide all sections first
+  autoSection.style.display = 'none';
+  manualSection.style.display = 'none';
+  bulkUnassignSection.style.display = 'none';
+  bulkChangeBuildingSection.style.display = 'none';
   
   if (mode === 'auto') {
     autoSection.style.display = 'block';
-    manualSection.style.display = 'none';
     populateAutoDepartmentSelect();
+  } else if (mode === 'bulk-unassign') {
+    bulkUnassignSection.style.display = 'block';
+    populateBulkUnassignDepartmentSelect();
+  } else if (mode === 'bulk-change-building') {
+    bulkChangeBuildingSection.style.display = 'block';
+    populateBulkChangeDepartmentSelect();
   } else {
-    autoSection.style.display = 'none';
     manualSection.style.display = 'block';
     updateStudentOptions();
     loadCurrentAssignment();
   }
+}
+
+function populateBulkUnassignDepartmentSelect() {
+  const departments = getDepartments();
+  const select = document.getElementById('bulk-unassign-department');
+  select.innerHTML = '<option value="">All Departments</option>';
+  departments.forEach(dept => {
+    const option = document.createElement('option');
+    option.value = dept.name;
+    option.textContent = `${dept.code} - ${dept.name}`;
+    select.appendChild(option);
+  });
+}
+
+function populateBulkChangeDepartmentSelect() {
+  const departments = getDepartments();
+  const select = document.getElementById('bulk-change-department');
+  select.innerHTML = '<option value="">Select Department</option>';
+  departments.forEach(dept => {
+    const option = document.createElement('option');
+    option.value = dept.name;
+    option.textContent = `${dept.code} - ${dept.name}`;
+    select.appendChild(option);
+  });
+}
+
+function populateBulkChangeBuildingSelect() {
+  const selectedGender = document.getElementById('bulk-change-gender').value;
+  const buildingSelect = document.getElementById('bulk-change-new-building');
+  buildingSelect.innerHTML = '<option value="">Select New Building</option>';
+
+  const buildings = getBuildings();
+  const filteredBuildings = selectedGender ? buildings.filter(b => b.gender === selectedGender) : buildings;
+  
+  filteredBuildings.forEach(b => {
+    const option = document.createElement('option');
+    option.value = b.name;
+    option.textContent = b.name;
+    buildingSelect.appendChild(option);
+  });
+}
+
+function handleBulkChangeBuildingFromSection() {
+  const dept = document.getElementById('bulk-change-department').value;
+  const gender = document.getElementById('bulk-change-gender').value;
+  const newBuildingName = document.getElementById('bulk-change-new-building').value;
+
+  if (!dept || !gender || !newBuildingName) {
+    showToast('Please fill all fields', 'error');
+    return;
+  }
+
+  const students = getStudents();
+  const buildings = getBuildings();
+  const newBuilding = buildings.find(b => b.name === newBuildingName);
+  
+  if (!newBuilding) {
+    showToast('Invalid building', 'error');
+    return;
+  }
+
+  let count = 0;
+  students.forEach(student => {
+    if (student.department === dept && student.gender === gender && student.dorm) {
+      student.building = newBuildingName;
+      count++;
+    }
+  });
+
+  if (count === 0) {
+    showToast('No assigned students found in this department and gender', 'info');
+    return;
+  }
+
+  if (!confirm(`Are you sure you want to change building for ${count} student(s) to ${newBuildingName}?`)) return;
+
+  saveStudents(students);
+  showToast(`Successfully changed building for ${count} student(s)`, 'success');
+  renderAdminTable();
+  renderBuildingsList();
+  updateDashboardOverview();
+  updateStudentOptions();
+}
+
+function handleBulkUnassign() {
+  const dept = document.getElementById('bulk-unassign-department').value;
+  const gender = document.getElementById('bulk-unassign-gender').value;
+
+  if (!dept && !gender) {
+    showToast('Please select at least a department or gender to bulk unassign', 'error');
+    return;
+  }
+
+  const students = getStudents();
+  let count = 0;
+
+  students.forEach(student => {
+    if (student.dorm) {
+      if ((!dept || student.department === dept) && (!gender || student.gender === gender)) {
+        student.building = '';
+        student.dorm = '';
+        student.capacity = '';
+        count++;
+      }
+    }
+  });
+
+  if (count === 0) {
+    showToast('No assigned students found with the selected filters', 'info');
+    return;
+  }
+
+  if (!confirm(`Are you sure you want to unassign ${count} student(s)?`)) return;
+
+  saveStudents(students);
+  showToast(`Successfully unassigned ${count} student(s)`, 'success');
+  renderAdminTable();
+  renderBuildingsList();
+  updateDashboardOverview();
+  updateStudentOptions();
 }
 
 function populateAutoDepartmentSelect() {
@@ -479,121 +611,7 @@ function handleUnassign() {
   }
 }
 
-function handleBulkUnassign() {
-  const dept = document.getElementById('filter-department').value;
-  const gender = document.getElementById('filter-gender').value;
 
-  if (!dept && !gender) {
-    showToast('Please select at least a department or gender to bulk unassign', 'error');
-    return;
-  }
-
-  const students = getStudents();
-  let count = 0;
-
-  students.forEach(student => {
-    if (student.dorm) {
-      if ((!dept || student.department === dept) && (!gender || student.gender === gender)) {
-        student.building = '';
-        student.dorm = '';
-        student.capacity = '';
-        count++;
-      }
-    }
-  });
-
-  if (count === 0) {
-    showToast('No assigned students found with the selected filters', 'info');
-    return;
-  }
-
-  if (!confirm(`Are you sure you want to unassign ${count} student(s)?`)) return;
-
-  saveStudents(students);
-  showToast(`Successfully unassigned ${count} student(s)`, 'success');
-  renderAdminTable();
-  renderBuildingsList();
-  updateDashboardOverview();
-  updateStudentOptions();
-}
-
-function openBulkChangeBuildingModal() {
-  const modal = document.getElementById('bulkChangeBuildingModalOverlay');
-  const deptSelect = document.getElementById('bulk-department');
-  
-  // Populate departments
-  const departments = getDepartments();
-  deptSelect.innerHTML = '<option value="">Select Department</option>';
-  departments.forEach(dept => {
-    const option = document.createElement('option');
-    option.value = dept.name;
-    option.textContent = `${dept.code} - ${dept.name}`;
-    deptSelect.appendChild(option);
-  });
-  
-  modal.classList.add('active');
-}
-
-function populateBulkBuildingSelect() {
-  const selectedGender = document.getElementById('bulk-gender').value;
-  const buildingSelect = document.getElementById('bulk-new-building');
-  buildingSelect.innerHTML = '<option value="">Select New Building</option>';
-
-  const buildings = getBuildings();
-  const filteredBuildings = selectedGender ? buildings.filter(b => b.gender === selectedGender) : buildings;
-  
-  filteredBuildings.forEach(b => {
-    const option = document.createElement('option');
-    option.value = b.name;
-    option.textContent = b.name;
-    buildingSelect.appendChild(option);
-  });
-}
-
-function handleBulkChangeBuilding(e) {
-  e.preventDefault();
-  const dept = document.getElementById('bulk-department').value;
-  const gender = document.getElementById('bulk-gender').value;
-  const newBuildingName = document.getElementById('bulk-new-building').value;
-
-  if (!dept || !gender || !newBuildingName) {
-    showToast('Please fill all fields', 'error');
-    return;
-  }
-
-  const students = getStudents();
-  const buildings = getBuildings();
-  const newBuilding = buildings.find(b => b.name === newBuildingName);
-  
-  if (!newBuilding) {
-    showToast('Invalid building', 'error');
-    return;
-  }
-
-  let count = 0;
-  students.forEach(student => {
-    if (student.department === dept && student.gender === gender && student.dorm) {
-      student.building = newBuildingName;
-      count++;
-    }
-  });
-
-  if (count === 0) {
-    showToast('No assigned students found in this department and gender', 'info');
-    closeModal('bulkChangeBuildingModalOverlay');
-    return;
-  }
-
-  if (!confirm(`Are you sure you want to change building for ${count} student(s) to ${newBuildingName}?`)) return;
-
-  saveStudents(students);
-  showToast(`Successfully changed building for ${count} student(s)`, 'success');
-  closeModal('bulkChangeBuildingModalOverlay');
-  renderAdminTable();
-  renderBuildingsList();
-  updateDashboardOverview();
-  updateStudentOptions();
-}
 
 function openAddModal() {
   document.getElementById('modalTitle').innerText = 'Add Student';
