@@ -81,7 +81,9 @@ function updateDashboardOverview() {
   let occupiedRooms = 0;
   buildings.forEach(b => {
     totalRooms += b.totalDorms;
-    for (let dorm = 1; dorm <= b.totalDorms; dorm++) {
+    const startRoom = b.startRoom || 1;
+    for (let i = 0; i < b.totalDorms; i++) {
+      const dorm = startRoom + i;
       const dormStr = String(dorm);
       const count = students.filter(s => s.building === b.name && s.dorm === dormStr).length;
       if (count > 0) occupiedRooms++;
@@ -851,10 +853,12 @@ function renderBuildingsList() {
     let occupied = 0;
     
     // Count occupied dorms in this building
-    for (let dorm = 1; dorm <= b.totalDorms; dorm++) {
+    const startRoom = b.startRoom || 1;
+    for (let i = 0; i < b.totalDorms; i++) {
+      const dorm = startRoom + i;
       const dormStr = String(dorm);
       const count = students.filter(s => s.building === b.name && s.dorm === dormStr).length;
-      occupied += Math.ceil(count / b.capacity);
+      occupied += count > 0 ? 1 : 0;
     }
 
     const available = b.totalDorms - occupied;
@@ -864,6 +868,7 @@ function renderBuildingsList() {
       <tr>
         <td><strong>${b.name}</strong></td>
         <td>${b.totalDorms}</td>
+        <td>${b.startRoom || 1}</td>
         <td>${b.capacity} Person(s)</td>
         <td><span class="badge badge-cyan">${b.gender}</span></td>
         <td>${occupied}</td>
