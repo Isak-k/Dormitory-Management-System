@@ -683,8 +683,8 @@ function deleteStudent(idx) {
   }
 }
 
-function handleAssign(e) {
-  e.preventDefault();
+function handleAssignManual() {
+  console.log('handleAssignManual called!');
   const sid = document.getElementById('assign-student-id').value;
   const buildingName = document.getElementById('assign-building').value;
   const dormNum = document.getElementById('assign-dorm').value;
@@ -731,6 +731,11 @@ function handleAssign(e) {
     updateDashboardOverview();
     updateDormOptions();
   }
+}
+
+function handleAssign(e) {
+  e.preventDefault();
+  handleAssignManual();
 }
 
 function updateDormOptions() {
