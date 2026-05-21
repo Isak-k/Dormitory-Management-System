@@ -225,12 +225,16 @@ function deleteDepartment(idx) {
 function renderAdminTable() {
   const students = getStudents();
   const filterDept = document.getElementById('filter-department').value;
+  const filterGender = document.getElementById('filter-gender').value;
   const tbody = document.getElementById('admin-student-list');
   tbody.innerHTML = '';
 
   let filteredStudents = students;
   if (filterDept) {
-    filteredStudents = students.filter(s => s.department === filterDept);
+    filteredStudents = filteredStudents.filter(s => s.department === filterDept);
+  }
+  if (filterGender) {
+    filteredStudents = filteredStudents.filter(s => s.gender === filterGender);
   }
 
   if (filteredStudents.length === 0) {

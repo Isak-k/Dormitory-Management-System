@@ -247,11 +247,18 @@
               <div class="glass-card" style="padding: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                   <h3 class="neon-text" style="font-size: 16px;">
-                    <i class="fa-solid fa-filter"></i> Filter by Department
+                    <i class="fa-solid fa-filter"></i> Filter Students
                   </h3>
-                  <select id="filter-department" class="form-select" style="width: 200px;" onchange="renderAdminTable()">
-                    <option value="">All Departments</option>
-                  </select>
+                  <div style="display: flex; gap: 10px;">
+                    <select id="filter-department" class="form-select" style="width: 200px;" onchange="renderAdminTable()">
+                      <option value="">All Departments</option>
+                    </select>
+                    <select id="filter-gender" class="form-select" style="width: 150px;" onchange="renderAdminTable()">
+                      <option value="">All Genders</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
                 </div>
                 <input type="text" id="studentSearch" placeholder="Search by name, ID..." class="form-input" style="width: 100%;">
               </div>
