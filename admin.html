@@ -247,7 +247,7 @@
               <div class="glass-card" style="padding: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                   <h3 class="neon-text" style="font-size: 16px;">
-                    <i class="fa-solid fa-filter"></i> Filter Students
+                    <i class="fa-solid fa-filter"></i> Filter & Bulk Actions
                   </h3>
                   <div style="display: flex; gap: 10px;">
                     <select id="filter-department" class="form-select" style="width: 200px;" onchange="renderAdminTable()">
@@ -261,6 +261,14 @@
                   </div>
                 </div>
                 <input type="text" id="studentSearch" placeholder="Search by name, ID..." class="form-input" style="width: 100%;">
+                <div style="display: flex; gap: 10px; margin-top: 12px;">
+                  <button class="btn btn-orange" onclick="handleBulkUnassign()">
+                    <i class="fa-solid fa-user-slash"></i> Bulk Unassign
+                  </button>
+                  <button class="btn btn-primary" onclick="openBulkChangeBuildingModal()">
+                    <i class="fa-solid fa-building"></i> Bulk Change Building
+                  </button>
+                </div>
               </div>
               <button class="btn btn-cyan" onclick="openAddModal()">
                 <i class="fa-solid fa-plus"></i> Add Student
@@ -655,6 +663,42 @@
         <div style="display: flex; gap: 10px; margin-top: 20px;">
           <button type="submit" class="btn btn-primary" style="flex: 1;">Update</button>
           <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="closeModal('editBuildingModalOverlay')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bulk Change Building Modal -->
+  <div class="modal-overlay" id="bulkChangeBuildingModalOverlay">
+    <div class="modal" style="max-width: 500px;">
+      <h3 class="gradient-text" style="font-size: 24px; margin-bottom: 20px;">Bulk Change Building</h3>
+      <form id="bulkChangeBuildingForm" onsubmit="handleBulkChangeBuilding(event)">
+        <div class="form-group">
+          <label class="form-label">Select Department</label>
+          <select id="bulk-department" class="form-select" required>
+            <option value="">Select Department</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Gender</label>
+          <select id="bulk-gender" class="form-select" required onchange="populateBulkBuildingSelect()">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">New Building</label>
+          <select id="bulk-new-building" class="form-select" required>
+            <option value="">Select New Building</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Change Building</button>
+          <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="closeModal('bulkChangeBuildingModalOverlay')">Cancel</button>
         </div>
       </form>
     </div>
