@@ -533,7 +533,8 @@ function handleAutoAssign() {
   }
 
   // Assign students
-  let currentDorm = 1;
+  const startRoom = building.startRoom || 1;
+  let currentDorm = startRoom;
   let currentDormCount = 0;
 
   studentsToAssign.forEach(student => {
@@ -746,9 +747,11 @@ function updateDormOptions() {
   if (!building) return;
 
   const students = getStudents();
+  const startRoom = building.startRoom || 1; // Default to 1 if not set
 
-  // Generate dorm numbers 1 to totalDorms
-  for (let dorm = 1; dorm <= building.totalDorms; dorm++) {
+  // Generate dorm numbers from startRoom to startRoom + totalDorms - 1
+  for (let i = 0; i < building.totalDorms; i++) {
+    const dorm = startRoom + i;
     const dormStr = String(dorm);
     const occupants = students.filter(s => s.building === building.name && s.dorm === dormStr).length;
     const available = building.capacity - occupants;
@@ -878,6 +881,7 @@ function handleAddBuilding(e) {
   e.preventDefault();
   const name = document.getElementById('building-name').value;
   const totalDorms = parseInt(document.getElementById('total-dorms').value);
+  const startRoom = parseInt(document.getElementById('start-room').value);
   const capacity = parseInt(document.getElementById('dorm-capacity').value);
   const gender = document.getElementById('building-gender').value;
 
@@ -893,6 +897,7 @@ function handleAddBuilding(e) {
     id: 'BLD-' + Date.now(),
     name,
     totalDorms,
+    startRoom,
     capacity,
     gender,
     createdAt: new Date().toLocaleString()
@@ -901,6 +906,7 @@ function handleAddBuilding(e) {
   saveBuildings(buildings);
   showToast('Building added successfully', 'success');
   document.getElementById('buildingForm').reset();
+  document.getElementById('start-room').value = '1'; // Reset to default
   renderBuildingsList();
   populateBuildingSelect();
   updateDashboardOverview();

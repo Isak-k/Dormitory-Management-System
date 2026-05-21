@@ -83,16 +83,25 @@ function saveReports(reports) {
 
 // ---- Default Buildings ----
 const DEFAULT_BUILDINGS = [
-  { id: 'BLD-001', name: 'Block A', totalDorms: 50, capacity: 2, gender: 'Male', createdAt: new Date().toLocaleString() },
-  { id: 'BLD-002', name: 'Block B', totalDorms: 50, capacity: 3, gender: 'Male', createdAt: new Date().toLocaleString() },
-  { id: 'BLD-003', name: 'Block C', totalDorms: 40, capacity: 2, gender: 'Female', createdAt: new Date().toLocaleString() },
+  { id: 'BLD-001', name: 'Block A', totalDorms: 50, startRoom: 1, capacity: 2, gender: 'Male', createdAt: new Date().toLocaleString() },
+  { id: 'BLD-002', name: 'Block B', totalDorms: 50, startRoom: 1, capacity: 3, gender: 'Male', createdAt: new Date().toLocaleString() },
+  { id: 'BLD-003', name: 'Block C', totalDorms: 40, startRoom: 1, capacity: 2, gender: 'Female', createdAt: new Date().toLocaleString() },
 ];
 
 // ---- Get Buildings ----
 function getBuildings() {
   const stored = localStorage.getItem('dms_buildings');
   if (stored) {
-    try { return JSON.parse(stored); }
+    try {
+      const buildings = JSON.parse(stored);
+      // Add startRoom to existing buildings if they don't have it
+      buildings.forEach(b => {
+        if (!b.startRoom) {
+          b.startRoom = 1;
+        }
+      });
+      return buildings;
+    }
     catch { return DEFAULT_BUILDINGS; }
   }
   localStorage.setItem('dms_buildings', JSON.stringify(DEFAULT_BUILDINGS));
