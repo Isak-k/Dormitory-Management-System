@@ -17,7 +17,18 @@ const DEFAULT_ADMIN = { username: 'admin', password: '3265/17' };
 function getStudents() {
   const stored = localStorage.getItem('dms_students');
   if (stored) {
-    try { return JSON.parse(stored); }
+    try { 
+      const students = JSON.parse(stored);
+      // Convert any numeric dorms to strings for consistency
+      students.forEach(s => {
+        if (s.dorm && typeof s.dorm === 'number') {
+          s.dorm = String(s.dorm);
+        }
+      });
+      // Save back the fixed data
+      localStorage.setItem('dms_students', JSON.stringify(students));
+      return students;
+    }
     catch { return DEFAULT_STUDENTS; }
   }
   localStorage.setItem('dms_students', JSON.stringify(DEFAULT_STUDENTS));

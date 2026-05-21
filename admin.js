@@ -82,7 +82,8 @@ function updateDashboardOverview() {
   buildings.forEach(b => {
     totalRooms += b.totalDorms;
     for (let dorm = 1; dorm <= b.totalDorms; dorm++) {
-      const count = students.filter(s => s.building === b.name && s.dorm === dorm).length;
+      const dormStr = String(dorm);
+      const count = students.filter(s => s.building === b.name && s.dorm === dormStr).length;
       if (count > 0) occupiedRooms++;
     }
   });
@@ -324,7 +325,7 @@ function loadCurrentAssignment() {
     document.getElementById('assign-building').value = student.building || '';
     updateDormOptions();
     if (student.dorm) {
-      document.getElementById('assign-dorm').value = student.dorm;
+      document.getElementById('assign-dorm').value = String(student.dorm);
     }
   }
 }
@@ -402,7 +403,7 @@ function handleAssign(e) {
   e.preventDefault();
   const sid = document.getElementById('assign-student-id').value;
   const buildingName = document.getElementById('assign-building').value;
-  const dormNum = parseInt(document.getElementById('assign-dorm').value);
+  const dormNum = document.getElementById('assign-dorm').value;
 
   if (!sid || !buildingName || !dormNum) {
     showToast('Please fill all fields', 'error');
@@ -465,12 +466,13 @@ function updateDormOptions() {
 
   // Generate dorm numbers 1 to totalDorms
   for (let dorm = 1; dorm <= building.totalDorms; dorm++) {
-    const occupants = students.filter(s => s.building === building.name && s.dorm === dorm).length;
+    const dormStr = String(dorm);
+    const occupants = students.filter(s => s.building === building.name && s.dorm === dormStr).length;
     const available = building.capacity - occupants;
     const status = available > 0 ? `(${available}/${building.capacity})` : '(Full)';
     
     const option = document.createElement('option');
-    option.value = dorm;
+    option.value = dormStr;
     option.textContent = `Dorm ${dorm} ${status}`;
     option.disabled = available <= 0;
     dormSelect.appendChild(option);
@@ -560,7 +562,8 @@ function renderBuildingsList() {
     
     // Count occupied dorms in this building
     for (let dorm = 1; dorm <= b.totalDorms; dorm++) {
-      const count = students.filter(s => s.building === b.name && s.dorm === dorm).length;
+      const dormStr = String(dorm);
+      const count = students.filter(s => s.building === b.name && s.dorm === dormStr).length;
       occupied += Math.ceil(count / b.capacity);
     }
 
